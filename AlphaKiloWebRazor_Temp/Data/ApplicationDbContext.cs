@@ -1,7 +1,7 @@
-﻿using AlphaKiloWeb.Models;
+﻿using AlphaKiloWebRazor_Temp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AlphaKiloWeb.Data {
+namespace AlphaKiloWebRazor_Temp.Data {
     public class ApplicationDbContext : DbContext{
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
             
