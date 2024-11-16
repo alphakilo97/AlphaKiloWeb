@@ -4,7 +4,7 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace AlphaKiloWeb.Migrations
+namespace AlphaKilo.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class SeedCategoriesTable : Migration

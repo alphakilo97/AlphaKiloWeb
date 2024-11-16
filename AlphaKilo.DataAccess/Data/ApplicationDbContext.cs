@@ -1,7 +1,7 @@
-﻿using AlphaKiloWeb.Models;
+﻿using AlphaKilo.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AlphaKiloWeb.Data {
+namespace AlphaKilo.DataAccess.Data {
     public class ApplicationDbContext : DbContext{
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
             

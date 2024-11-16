@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace AlphaKiloWeb.Migrations
+namespace AlphaKilo.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class AddCategoryTableToDb : Migration

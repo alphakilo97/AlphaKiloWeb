@@ -1,5 +1,5 @@
-﻿using AlphaKiloWeb.Data;
-using AlphaKiloWeb.Models;
+﻿using AlphaKilo.DataAccess.Data;
+using AlphaKilo.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlphaKiloWeb.Controllers {
@@ -17,7 +17,7 @@ namespace AlphaKiloWeb.Controllers {
         }
         [HttpPost]
         public IActionResult Create(Category newCategory) {
-            if(double.TryParse(newCategory.Name, out double i)){
+            if(double.TryParse(newCategory.Name, out _)){
                 ModelState.AddModelError("name", "Category Name cannot be numeric");
             }
             if(ModelState.IsValid){
@@ -42,7 +42,7 @@ namespace AlphaKiloWeb.Controllers {
         }
         [HttpPost]
         public IActionResult Edit(Category newCategory) {
-            if (double.TryParse(newCategory.Name, out double i)) {
+            if (double.TryParse(newCategory.Name, out _)) {
                 ModelState.AddModelError("name", "Category Name cannot be numeric");
             }
             if (ModelState.IsValid) {

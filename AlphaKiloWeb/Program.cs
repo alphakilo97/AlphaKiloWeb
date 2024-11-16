@@ -1,4 +1,4 @@
-using AlphaKiloWeb.Data;
+using AlphaKilo.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

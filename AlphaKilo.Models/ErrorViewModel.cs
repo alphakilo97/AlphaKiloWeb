@@ -1,4 +1,4 @@
-namespace AlphaKiloWeb.Models {
+namespace AlphaKilo.Models {
     public class ErrorViewModel {
         public string? RequestId { get; set; }
 
