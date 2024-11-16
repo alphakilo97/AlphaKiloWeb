@@ -1,15 +1,16 @@
 ﻿using AlphaKilo.DataAccess.Data;
+using AlphaKilo.DataAccess.Repository.IRepository;
 using AlphaKilo.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlphaKiloWeb.Controllers {
     public class CategoryController : Controller {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db) {
-            _db = db;
+        private readonly ICategoryRepository _categoryRepo;
+        public CategoryController(ICategoryRepository categoryRepo) {
+            _categoryRepo = categoryRepo;
         }
         public IActionResult Index() {
-            List<Category> categoryList = _db.Categories.ToList();
+            List<Category> categoryList = _categoryRepo.GetAll().ToList<Category>();
             return View(categoryList);
         }
         public IActionResult Create() {
@@ -21,8 +22,8 @@ namespace AlphaKiloWeb.Controllers {
                 ModelState.AddModelError("name", "Category Name cannot be numeric");
             }
             if(ModelState.IsValid){
-                _db.Categories.Add(newCategory);
-                _db.SaveChanges();
+                _categoryRepo.Add(newCategory);
+                _categoryRepo.SaveChanges();
                 TempData["success"] = $"Category '{newCategory.Name}' created successfully!";
                 return RedirectToAction("Index");
             }
@@ -32,8 +33,8 @@ namespace AlphaKiloWeb.Controllers {
             if(id == null || id == 0) {
                 return NotFound($"{id} is not a valid Category id.");
             }
-            Category? existingCategory = _db.Categories.Find(id);
-            //Category? existingCategory1 = _db.Categories.FirstOrDefault(u => u.Id == id);
+            //Category? existingCategory = _db.Categories.Find(id);
+            Category? existingCategory = _categoryRepo.Get(u => u.Id == id);
             //Category? existingCategory2 = _db.Categories.Where(u => u.Id == id).FirstOrDefault();
             if (existingCategory == null) {
                 return NotFound($"Category with id: {id} doesn't exist.");
@@ -46,8 +47,8 @@ namespace AlphaKiloWeb.Controllers {
                 ModelState.AddModelError("name", "Category Name cannot be numeric");
             }
             if (ModelState.IsValid) {
-                _db.Categories.Update(newCategory);
-                _db.SaveChanges();
+                _categoryRepo.Update(newCategory);
+                _categoryRepo.SaveChanges();
                 TempData["success"] = $"Category '{newCategory.Name}' edited successfully!";
                 return RedirectToAction("Index");
             }
@@ -57,7 +58,8 @@ namespace AlphaKiloWeb.Controllers {
             if (id == null || id == 0) {
                 return NotFound($"{id} is not a valid Category id.");
             }
-            Category? toDelete = _db.Categories.Find(id);
+            //Category? toDelete = _db.Categories.Find(id);
+            Category? toDelete = _categoryRepo.Get(u => u.Id == id);
             if (toDelete == null) {
                 return NotFound($"Category with id: {id} doesn't exist.");
             }
@@ -65,11 +67,11 @@ namespace AlphaKiloWeb.Controllers {
         }
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id) {
-            Category? toDelete = _db.Categories.Find(id);
+            Category? toDelete = _categoryRepo.Get(u => u.Id == id);
             if (toDelete != null) {
                 var name = toDelete.Name;
-                _db.Categories.Remove(toDelete);
-                _db.SaveChanges();
+                _categoryRepo.Remove(toDelete);
+                _categoryRepo.SaveChanges();
                 TempData["success"] = $"Category '{name}' removed successfully!";
                 return RedirectToAction("Index");
             }
