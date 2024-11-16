@@ -1,6 +1,5 @@
 ﻿using AlphaKilo.DataAccess.Data;
 using AlphaKilo.DataAccess.Repository.IRepository;
-using AlphaKilo.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +7,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AlphaKilo.DataAccess.Repository {
-    public class CategoryRepository : Repository<Category>, ICategoryRepository {
+    public class UnitOfWork : IUnitOfWork {
+        public ICategoryRepository Category{ get; private set; }
         private readonly ApplicationDbContext _db;
-        public CategoryRepository(ApplicationDbContext db) : base(db) {
-            _db = db;
-        }
 
-        public void Update(Category category) {
-            _db.Categories.Update(category);
+        public UnitOfWork(ApplicationDbContext db) {
+            _db = db;
+            Category = new CategoryRepository(_db);
+        }
+        public void SaveChanges() {
+            _db.SaveChanges();
         }
     }
 }
