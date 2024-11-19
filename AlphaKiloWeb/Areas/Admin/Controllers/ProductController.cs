@@ -17,7 +17,7 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
         }
 
         public IActionResult Index() {
-            List<Product> products = _unitOfWork.Product.GetAll().ToList();
+            List<Product> products = _unitOfWork.Product.GetAll(includeProperties:"Category").ToList();
             IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
                 .Select(u=> new SelectListItem {
                 Text = u.Name,
@@ -74,37 +74,33 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
             _unitOfWork.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll() {
+            List<Product> products = _unitOfWork.Product.GetAll(includeProperties: "Category").ToList();
+            return Json(new {data = products});
+        }
+
+        [HttpDelete]
         public IActionResult Delete(int? id) {
-            if (id == null || id == 0) {
-                return NotFound($"{id} is not a valid Product id.");
+            var toDelete = _unitOfWork.Product.Get(u => u.Id == id);
+            if (toDelete == null || toDelete.Id == 0) {
+                return Json(new { success = false, message = $"Product with id: '{id}' not found."});
             }
-            Product? toDelete = _unitOfWork.Product.Get(u => u.Id == id);
-            if (toDelete == null) {
-                return NotFound($"Product with id: {id} doesn't exist.");
+            if (!string.IsNullOrEmpty(toDelete.ImageUrl)) {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                var oldimagepath = Path.Combine(wwwRootPath, toDelete.ImageUrl.TrimStart('\\'));
+
+                if (System.IO.File.Exists(oldimagepath)) {
+                    System.IO.File.Delete(oldimagepath);
+                }
             }
-            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
-                .Select(u => new SelectListItem {
-                    Text = u.Name,
-                    Value = u.Id.ToString()
-                });
-            ProductVM viewmodel = new ProductVM {
-                CategoryList = CategoryList,
-                Product = toDelete
-            };
-            return View(viewmodel);
+            _unitOfWork.Product.Remove(toDelete);
+            _unitOfWork.SaveChanges();
+            return Json(new { success = true, message = $"Product with id: '{id}' was deleted successfully!" });
         }
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeletePOST(int? id) {
-            Product? toDelete = _unitOfWork.Product.Get(u => u.Id == id);
-            if (toDelete != null) {
-                var title = toDelete.Title;
-                _unitOfWork.Product.Remove(toDelete);
-                _unitOfWork.SaveChanges();
-                TempData["success"] = $"Product '{title}' removed successfully!";
-                return RedirectToAction("Index");
-            }
-            return NotFound($"Product with id: {id} doesn't exist.");
-        }
+        #endregion
     }
 }
 
