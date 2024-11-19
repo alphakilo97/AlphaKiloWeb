@@ -13,7 +13,7 @@ function loadDataTable() {
             { data: 'description', width: '35%'},
             { data: 'isbn', width: '10%'},
             { data: 'category.name', width: '10%'},
-            { data: 'price50', width: '5%'},
+            { data: 'listPrice', width: '5%'},
             {
                 data: 'id',
                 "render": function (data) {
