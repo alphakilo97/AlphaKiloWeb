@@ -1,5 +1,6 @@
 ﻿using AlphaKilo.DataAccess.Repository.IRepository;
 using AlphaKilo.Models;
+using AlphaKilo.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -28,16 +29,18 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-            //ViewBag.CategoryList = CategoryList;
-            ViewData["CategoryList"] = CategoryList;
-            return View();
+            ProductVM viewmodel = new ProductVM {
+                CategoryList = CategoryList,
+                Product = new Product()
+            };
+            return View(viewmodel);
         }
         [HttpPost]
-        public IActionResult Create(Product newProduct) {
+        public IActionResult Create(ProductVM newProduct) {
             if (ModelState.IsValid) {
-                _unitOfWork.Product.Add(newProduct);
+                _unitOfWork.Product.Add(newProduct.Product);
                 _unitOfWork.SaveChanges();
-                TempData["success"] = $"Product '{newProduct.Title}' added successfully!";
+                TempData["success"] = $"Product '{newProduct.Product.Title}' added successfully!";
                 return RedirectToAction("Index");
             }
             return View();
