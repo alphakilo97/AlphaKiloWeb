@@ -10,8 +10,10 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
     [Area("Admin")]
     public class ProductController : Controller{
         private readonly IUnitOfWork _unitOfWork;
-        public ProductController(IUnitOfWork unitOfWork) {
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment) {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index() {
@@ -23,7 +25,7 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
             });
             return View(products);
         }
-        public IActionResult Create() {
+        public IActionResult Upsert(int? id) {
             IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
                 .Select(u => new SelectListItem {
                     Text = u.Name,
@@ -33,37 +35,44 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
                 CategoryList = CategoryList,
                 Product = new Product()
             };
-            return View(viewmodel);
+            if(id == null || id == 0) {
+                return View(viewmodel);
+            }
+            else {
+                viewmodel.Product = _unitOfWork.Product.Get(u => u.Id == id);
+                return View(viewmodel);
+            }
         }
         [HttpPost]
-        public IActionResult Create(ProductVM newProduct) {
-            if (ModelState.IsValid) {
+        public IActionResult Upsert(ProductVM newProduct, IFormFile? file) {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            if(file != null) {
+                string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                string productPath = Path.Combine(wwwRootPath, @"images/product");
+
+                if (!string.IsNullOrEmpty(newProduct.Product.ImageUrl)) {
+                    var oldimagepath = Path.Combine(wwwRootPath, newProduct.Product.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldimagepath)) {
+                        System.IO.File.Delete(oldimagepath);
+                    }
+                }
+
+                using(var filestream = new FileStream(Path.Combine(productPath, filename), FileMode.Create)) {
+                    file.CopyTo(filestream);
+                }
+                newProduct.Product.ImageUrl = @"\images\product\" + filename; 
+            }
+            if (newProduct.Product.Id == 0) {
                 _unitOfWork.Product.Add(newProduct.Product);
-                _unitOfWork.SaveChanges();
                 TempData["success"] = $"Product '{newProduct.Product.Title}' added successfully!";
-                return RedirectToAction("Index");
             }
-            return View();
-        }
-        public IActionResult Edit(int? id) {
-            if (id == null || id == 0) {
-                return NotFound($"{id} is not a valid Product id.");
+            else {
+                _unitOfWork.Product.Update(newProduct.Product);
+                TempData["success"] = $"Product '{newProduct.Product.Title}' updated successfully!";
             }
-            Product? existingProduct = _unitOfWork.Product.Get(u => u.Id == id);
-            if (existingProduct == null) {
-                return NotFound($"Product with id: {id} doesn't exist.");
-            }
-            return View(existingProduct);
-        }
-        [HttpPost]
-        public IActionResult Edit(Product newProduct) {
-            if (ModelState.IsValid) {
-                _unitOfWork.Product.Update(newProduct);
-                _unitOfWork.SaveChanges();
-                TempData["success"] = $"Product '{newProduct.Title}' edited successfully!";
-                return RedirectToAction("Index");
-            }
-            return View();
+            _unitOfWork.SaveChanges();
+            return RedirectToAction("Index");
         }
         public IActionResult Delete(int? id) {
             if (id == null || id == 0) {
@@ -73,7 +82,16 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
             if (toDelete == null) {
                 return NotFound($"Product with id: {id} doesn't exist.");
             }
-            return View(toDelete);
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll()
+                .Select(u => new SelectListItem {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+            ProductVM viewmodel = new ProductVM {
+                CategoryList = CategoryList,
+                Product = toDelete
+            };
+            return View(viewmodel);
         }
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id) {
