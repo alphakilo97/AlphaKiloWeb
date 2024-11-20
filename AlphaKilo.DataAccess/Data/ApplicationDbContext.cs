@@ -1,15 +1,20 @@
 ﻿using AlphaKilo.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlphaKilo.DataAccess.Data {
-    public class ApplicationDbContext : DbContext{
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>{
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
             
         }
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers {  get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Action", DisplayOrder = 2 },
                 new Category { Id = 2, Name = "Sci-Fi", DisplayOrder = 4 },
@@ -76,6 +81,7 @@ namespace AlphaKilo.DataAccess.Data {
                     CategoryId = 4
                 }
             );
+
         }
 
     }
