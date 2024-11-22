@@ -1,11 +1,14 @@
 ﻿using AlphaKilo.DataAccess.Data;
 using AlphaKilo.DataAccess.Repository.IRepository;
 using AlphaKilo.Models;
+using AlphaKilo.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlphaKiloWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = StaticDetails.Role_Admin)]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
