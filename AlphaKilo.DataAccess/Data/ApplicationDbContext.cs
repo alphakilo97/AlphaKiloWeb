@@ -8,9 +8,9 @@ namespace AlphaKilo.DataAccess.Data {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
             
         }
-
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers {  get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
@@ -81,7 +81,11 @@ namespace AlphaKilo.DataAccess.Data {
                     CategoryId = 4
                 }
             );
-
+            modelBuilder.Entity<Company>().HasData(
+                new Company { Id = 1, Name = "Google", PhoneNumber = "(650) 253-0000", StreetAddress = "1600 Amphitheatre Parkway", City = "Mountain View",  State="California", PostalCode = "94035",},
+                new Company { Id = 2, Name = "Amazon", PhoneNumber = "(206) 266-1000", StreetAddress = "410 Terry Ave. North", City = "Seattle",  State="Washington", PostalCode = "98109", },
+                new Company { Id = 3, Name = "Meta", PhoneNumber = "(650) 543-4800", StreetAddress = "1 Meta Way", City = "Menlo Park",  State="California", PostalCode = "94025",}
+            );
         }
 
     }
