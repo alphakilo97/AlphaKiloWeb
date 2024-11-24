@@ -10,6 +10,7 @@ namespace AlphaKilo.DataAccess.Repository.IRepository {
         IProductRepository Product { get; }
         ICompanyRepository Company { get; }
         IShoppingCartRepository ShoppingCart { get; }
+        IApplicationUserResopsitory ApplicationUser {  get; }
         void SaveChanges();
     }
 }
