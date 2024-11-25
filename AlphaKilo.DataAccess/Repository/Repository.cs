@@ -22,8 +22,8 @@ namespace AlphaKilo.DataAccess.Repository {
             dbSet.Add(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null) {
-            IQueryable<T> query = dbSet;
+        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false) {
+            IQueryable<T> query = tracked ? dbSet : dbSet.AsNoTracking();
             query = query.Where(filter);
             if (!string.IsNullOrEmpty(includeProperties)) {
                 foreach (var includeprop in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries)) {
@@ -33,14 +33,16 @@ namespace AlphaKilo.DataAccess.Repository {
             return query.FirstOrDefault();
         }
 
-        public IEnumerable<T> GetAll(string? includeProperties = null) {
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null) {
             IQueryable<T> query = dbSet;
+            if(filter != null)
+                query = query.Where(filter);
             if (!string.IsNullOrEmpty(includeProperties)) {
                 foreach (var includeprop in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries)) {
                     query = query.Include(includeprop);
                 }
             }
-            return query.ToList();
+            return [.. query];
         }
 
         public void Remove(T entity) {

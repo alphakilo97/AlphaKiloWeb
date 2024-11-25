@@ -15,7 +15,7 @@ namespace AlphaKilo.DataAccess.Repository {
         }
 
         public void Update(ShoppingCart shoppingCart) {
-            _db.ShoppingCarts.Add(shoppingCart);
+            _db.ShoppingCarts.Update(shoppingCart);
         }
     }
 }

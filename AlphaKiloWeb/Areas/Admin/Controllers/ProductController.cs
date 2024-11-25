@@ -11,13 +11,9 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
 
     [Area("Admin")]
     [Authorize(Roles = StaticDetails.Role_Admin)]
-    public class ProductController : Controller{
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment) {
-            _unitOfWork = unitOfWork;
-            _webHostEnvironment = webHostEnvironment;
-        }
+    public class ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment) : Controller{
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
         public IActionResult Index() {
             List<Product> products = _unitOfWork.Product.GetAll(includeProperties:"Category").ToList();
@@ -34,7 +30,7 @@ namespace AlphaKiloWeb.Areas.Admin.Controllers {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-            ProductVM viewmodel = new ProductVM {
+            ProductVM viewmodel = new() {
                 CategoryList = CategoryList,
                 Product = new Product()
             };
